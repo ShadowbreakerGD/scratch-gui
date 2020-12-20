@@ -272,7 +272,8 @@ const TWStateManager = function (WrappedComponent) {
 
             if (urlParams.has('fps')) {
                 const fps = +urlParams.get('fps');
-                if (Number.isNaN(fps) || fps < 0) {
+                // TODO: more intuitive way to use rAF than set fps=<0
+                if (Number.isNaN(fps)) {
                     alert(this.props.intl.formatMessage(messages.invalidFPS));
                 } else {
                     this.props.vm.setFramerate(fps);

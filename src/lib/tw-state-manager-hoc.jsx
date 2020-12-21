@@ -398,12 +398,6 @@ const TWStateManager = function (WrappedComponent) {
                 const runtimeOptions = this.props.runtimeOptions;
                 const compilerOptions = this.props.compilerOptions;
 
-                if (this.props.framerate === 30) {
-                    searchParams.delete('fps');
-                } else {
-                    searchParams.set('fps', this.props.framerate);
-                }
-
                 if (this.props.turbo) {
                     searchParams.set('turbo', '');
                 } else {

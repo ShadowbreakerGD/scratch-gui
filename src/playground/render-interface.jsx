@@ -57,6 +57,14 @@ const Interface = ({
                         <div className={styles.section}>
                             <ProjectInput />
                         </div>
+                        {description.instructions || description.credits ? (
+                            <div className={styles.section}>
+                                <Description
+                                    instructions={description.instructions}
+                                    credits={description.credits}
+                                />
+                            </div>
+                        ) : null}
                         <div className={styles.section}>
                             <p>This is an experiment that tries to make projects run at 60 FPS without making them run too fast by interpolating every other frame.</p>
                             <ul>
@@ -66,14 +74,6 @@ const Interface = ({
                                 <li>Expect to find bugs. Please report them.</li>
                             </ul>
                         </div>
-                        {description.instructions || description.credits ? (
-                            <div className={styles.section}>
-                                <Description
-                                    instructions={description.instructions}
-                                    credits={description.credits}
-                                />
-                            </div>
-                        ) : null}
                         <div className={styles.section}>
                             <p>
                                 <FormattedMessage

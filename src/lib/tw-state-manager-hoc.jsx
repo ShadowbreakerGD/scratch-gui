@@ -147,9 +147,11 @@ class WildcardRouter extends Router {
     onhashchange () {
         const hashProjectId = readHashProjectId();
         if (hashProjectId) {
-            this.onSetProjectId(hashProjectId);
-            // Completely remove the hash
-            history.replaceState(null, null, `${location.pathname}${location.search}`);
+            const ok = this.onSetProjectId(hashProjectId);
+            if (ok) {
+                // Completely remove the hash
+                history.replaceState(null, null, `${location.pathname}${location.search}`);
+            }
         } else {
             // Do not detect page type here as it is already setup by index.html, editor.html, etc.
             this.parseURL(false);
@@ -259,7 +261,10 @@ const TWStateManager = function (WrappedComponent) {
             super(props);
             bindAll(this, [
                 'handleHashChange',
-                'handlePopState'
+                'handlePopState',
+                'onSetProjectId',
+                'onSetIsPlayerOnly',
+                'onSetIsFullScreen'
             ]);
         }
         componentDidMount () {
@@ -284,10 +289,10 @@ const TWStateManager = function (WrappedComponent) {
             } else {
                 const persistentUsername = getLocalStorage(USERNAME_KEY);
                 if (persistentUsername === null) {
-                    const randomNumber = Math.random().toString();
-                    const randomId = randomNumber.substr(2, 6);
+                    const digits = 4;
+                    const randomNumber = Math.round(Math.random() * (10 ** digits));
+                    const randomId = randomNumber.toString().padStart(digits, '0');
                     const randomUsername = `player${randomId}`;
-                    setLocalStorage(USERNAME_KEY, randomUsername);
                     this.props.onSetUsername(randomUsername);
                 } else {
                     this.props.onSetUsername(persistentUsername);
@@ -302,9 +307,15 @@ const TWStateManager = function (WrappedComponent) {
                 this.props.vm.setTurboMode(true);
             }
 
-            if (urlParams.has('stuck')) {
+            if (urlParams.has('stuck') || urlParams.has('warp_timer')) {
                 this.props.vm.setCompilerOptions({
                     warpTimer: true
+                });
+            }
+
+            if (urlParams.has('nocompile')) {
+                this.props.vm.setCompilerOptions({
+                    enabled: false
                 });
             }
 
@@ -320,7 +331,10 @@ const TWStateManager = function (WrappedComponent) {
             }
 
             if (urlParams.has('project_url')) {
-                const projectUrl = urlParams.get('project_url');
+                let projectUrl = urlParams.get('project_url');
+                if (!projectUrl.startsWith('http:') && !projectUrl.startsWith('https:')) {
+                    projectUrl = `https://${projectUrl}`;
+                }
                 this.props.onProjectFetchStarted();
                 progressMonitor.fetchWithProgress(projectUrl)
                     .then(res => {
@@ -341,9 +355,9 @@ const TWStateManager = function (WrappedComponent) {
             }
 
             const routerCallbacks = {
-                onSetProjectId: this.props.onSetProjectId,
-                onSetIsPlayerOnly: this.props.onSetIsPlayerOnly,
-                onSetIsFullScreen: this.props.onSetIsFullScreen
+                onSetProjectId: this.onSetProjectId,
+                onSetIsPlayerOnly: this.onSetIsPlayerOnly,
+                onSetIsFullScreen: this.onSetIsFullScreen
             };
             this.router = createRouter(this.props.routingStyle, routerCallbacks);
             this.router.onhashchange();
@@ -372,6 +386,70 @@ const TWStateManager = function (WrappedComponent) {
                     history.pushState(null, null, newPath);
                 }
             }
+
+            if (
+                this.props.runtimeOptions !== prevProps.runtimeOptions ||
+                this.props.compilerOptions !== prevProps.compilerOptions ||
+                this.props.highQualityPen !== prevProps.highQualityPen ||
+                this.props.framerate !== prevProps.framerate ||
+                this.props.turbo !== prevProps.turbo
+            ) {
+                const searchParams = new URLSearchParams(location.search);
+                const runtimeOptions = this.props.runtimeOptions;
+                const compilerOptions = this.props.compilerOptions;
+
+                if (this.props.framerate === 30) {
+                    searchParams.delete('fps');
+                } else {
+                    searchParams.set('fps', this.props.framerate);
+                }
+
+                if (this.props.turbo) {
+                    searchParams.set('turbo', '');
+                } else {
+                    searchParams.delete('turbo');
+                }
+
+                if (this.props.highQualityPen) {
+                    searchParams.set('hqpen', '');
+                } else {
+                    searchParams.delete('hqpen');
+                }
+
+                if (compilerOptions.enabled) {
+                    searchParams.delete('nocompile');
+                } else {
+                    searchParams.set('nocompile', '');
+                }
+
+                if (this.props.isPlayerOnly) {
+                    if (compilerOptions.warpTimer) {
+                        searchParams.set('stuck', '');
+                    } else {
+                        searchParams.delete('stuck');
+                    }
+                } else {
+                    // Leave ?stuck as-is when in editor
+                }
+
+                if (runtimeOptions.maxClones === 300) {
+                    searchParams.delete('clones');
+                } else {
+                    searchParams.set('clones', runtimeOptions.maxClones);
+                }
+
+                let newSearch = searchParams.toString();
+                if (newSearch.length > 0) {
+                    // Add leading question mark
+                    newSearch = `?${newSearch}`;
+                    // Remove '=' from empty values
+                    newSearch = newSearch.replace(/=(?=$|&)/g, '');
+                }
+ 
+                if (location.search !== newSearch) {
+                    history.replaceState(null, null, `${location.pathname}${newSearch}${location.hash}`);
+                }
+            }
         }
         componentWillUnmount () {
             window.removeEventListener('hashchange', this.handleHashChange);
@@ -383,11 +461,36 @@ const TWStateManager = function (WrappedComponent) {
         handlePopState () {
             this.router.onpathchange();
         }
+        onSetProjectId (id) {
+            if (`${id}` === `${this.props.reduxProjectId}`) {
+                return true;
+            }
+            if (this.props.projectChanged) {
+                if (!confirm('Are you sure you want to switch project?')) {
+                    return false;
+                }
+            }
+            this.props.onSetProjectId(id);
+            return true;
+        }
+        onSetIsPlayerOnly (isPlayerOnly) {
+            this.props.onSetIsPlayerOnly(isPlayerOnly);
+        }
+        onSetIsFullScreen (isFullScreen) {
+            this.props.onSetIsFullScreen(isFullScreen);
+        }
         render () {
             const {
                 /* eslint-disable no-unused-vars */
+                intl,
                 isFullScreen,
                 isPlayerOnly,
+                projectChanged,
+                compilerOptions,
+                runtimeOptions,
+                highQualityPen,
+                framerate,
+                turbo,
                 onProjectFetchFinished,
                 onProjectFetchStarted,
                 onSetIsFullScreen,
@@ -412,6 +515,13 @@ const TWStateManager = function (WrappedComponent) {
         intl: intlShape,
         isFullScreen: PropTypes.bool,
         isPlayerOnly: PropTypes.bool,
+        projectChanged: PropTypes.bool,
+        projectId: PropTypes.string,
+        compilerOptions: PropTypes.shape({}),
+        runtimeOptions: PropTypes.shape({}),
+        highQualityPen: PropTypes.bool,
+        framerate: PropTypes.number,
+        turbo: PropTypes.bool,
         onProjectFetchFinished: PropTypes.func,
         onProjectFetchStarted: PropTypes.func,
         onSetIsFullScreen: PropTypes.func,
@@ -429,7 +539,13 @@ const TWStateManager = function (WrappedComponent) {
     const mapStateToProps = state => ({
         isFullScreen: state.scratchGui.mode.isFullScreen,
         isPlayerOnly: state.scratchGui.mode.isPlayerOnly,
+        projectChanged: state.scratchGui.projectChanged,
         reduxProjectId: state.scratchGui.projectState.projectId,
+        compilerOptions: state.scratchGui.tw.compilerOptions,
+        runtimeOptions: state.scratchGui.tw.runtimeOptions,
+        highQualityPen: state.scratchGui.tw.highQualityPen,
+        framerate: state.scratchGui.tw.framerate,
+        turbo: state.scratchGui.vmStatus.turbo,
         username: state.scratchGui.tw.username,
         vm: state.scratchGui.vm
     });

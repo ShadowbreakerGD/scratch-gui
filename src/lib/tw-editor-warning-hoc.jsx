@@ -6,15 +6,28 @@ import {showStandardAlert} from '../reducers/alerts';
 const TWEditorWarningHOC = function (WrappedComponent) {
     class EditorWarningComponent extends React.Component {
         componentDidMount () {
-            if (this.props.alerts.find(i => i.alertId === 'twWarning')) {
-                return;
+            this.enableWarpTimerIfInEditor();
+        }
+        shouldComponentUpdate () {
+            return !this.disabled;
+        }
+        componentDidUpdate () {
+            this.enableWarpTimerIfInEditor();
+        }
+        enableWarpTimerIfInEditor () {
+            if (!this.props.isPlayerOnly) {
+                this.props.onShowWarning();
+                this.props.vm.setCompilerOptions({
+                    warpTimer: true
+                });
+                this.disabled = true;
             }
-            this.props.onShowWarning();
         }
         render () {
             const {
                 /* eslint-disable no-unused-vars */
                 alerts,
+                compilerOptions,
                 isPlayerOnly,
                 onShowWarning,
                 /* eslint-enable no-unused-vars */
@@ -28,15 +41,20 @@ const TWEditorWarningHOC = function (WrappedComponent) {
         }
     }
     EditorWarningComponent.propTypes = {
-        alerts: PropTypes.arrayOf(PropTypes.shape({
-            alertId: PropTypes.string
-        })),
+        compilerOptions: PropTypes.shape({
+            enabled: PropTypes.bool,
+            warpTimer: PropTypes.bool
+        }),
         isPlayerOnly: PropTypes.bool,
-        onShowWarning: PropTypes.func
+        onShowWarning: PropTypes.func,
+        vm: PropTypes.shape({
+            setCompilerOptions: PropTypes.func
+        })
     };
     const mapStateToProps = state => ({
-        alerts: state.scratchGui.alerts.alertsList,
-        isPlayerOnly: state.scratchGui.mode.isPlayerOnly
+        compilerOptions: state.scratchGui.tw.compilerOptions,
+        isPlayerOnly: state.scratchGui.mode.isPlayerOnly,
+        vm: state.scratchGui.vm
     });
     const mapDispatchToProps = dispatch => ({
         onShowWarning: () => dispatch(showStandardAlert('twWarning'))

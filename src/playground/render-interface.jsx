@@ -124,8 +124,8 @@ const Interface = ({
                                 >
                                     <FormattedMessage
                                         defaultMessage="Source Code"
-                                        description="Link to footer to source code"
-                                        id="tw.footer.source"
+                                        description="Link to source code"
+                                        id="tw.code"
                                     />
                                 </a>
                                 {' - '}
@@ -136,8 +136,8 @@ const Interface = ({
                                 >
                                     <FormattedMessage
                                         defaultMessage="Feedback & Bugs"
-                                        description="Link in footer to give feedback"
-                                        id="tw.footer.feedback"
+                                        description="Link to feedback/bugs page"
+                                        id="tw.feedback"
                                     />
                                 </a>
                                 {' - '}
@@ -148,8 +148,8 @@ const Interface = ({
                                 >
                                     <FormattedMessage
                                         defaultMessage="Privacy"
-                                        description="Link in footer to privacy policy"
-                                        id="tw.footer.privacy"
+                                        description="Link to privacy policy"
+                                        id="tw.privacy"
                                     />
                                 </a>
                             </p>

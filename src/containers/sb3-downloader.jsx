@@ -2,9 +2,26 @@ import bindAll from 'lodash.bindall';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {connect} from 'react-redux';
+import {injectIntl, defineMessages, intlShape} from 'react-intl';
 import {projectTitleInitialState} from '../reducers/project-title';
 import downloadBlob from '../lib/download-blob';
 import {setProjectUnchanged} from '../reducers/project-changed';
+import {showStandardAlert, showAlertWithTimeout} from '../reducers/alerts';
+import {setFileHandle} from '../reducers/tw';
+import FileSystemAPI from '../lib/tw-filesystem-api';
+
+// tw: we make some extensive changes to file saving
+//  - use the experimental FileSystem API when possible
+//  - saving marks project as unchanged
+//  - show spinner while saving and message when finished
+
+const messages = defineMessages({
+    error: {
+        defaultMessage: `Could not save file. ({error})`,
+        description: 'Error displayed when a file could not be saved',
+        id: 'tw.fs.saveError'
+    }
+});
 
 /**
  * Project saver component passes a downloadProject function to its child.
@@ -24,17 +41,76 @@ class SB3Downloader extends React.Component {
     constructor (props) {
         super(props);
         bindAll(this, [
-            'downloadProject'
+            'downloadProject',
+            'saveAsNew',
+            'saveToLastFile',
+            'saveToLastFileOrNew'
         ]);
     }
-    downloadProject () {
+    startedSaving () {
+        this.props.onShowSavingAlert();
+    }
+    finishedSaving () {
         this.props.onProjectUnchanged();
+        this.props.onShowSaveSuccessAlert();
+        if (this.props.onSaveFinished) {
+            this.props.onSaveFinished();
+        }
+    }
+    downloadProject () {
+        this.startedSaving();
         this.props.saveProjectSb3().then(content => {
-            if (this.props.onSaveFinished) {
-                this.props.onSaveFinished();
-            }
+            this.finishedSaving();
             downloadBlob(this.props.projectFilename, content);
         });
+    }
+    async saveAsNew () {
+        try {
+            const handle = await FileSystemAPI.showSaveFilePicker();
+            await this.saveToHandle(handle);
+            this.props.onSetFileHandle(handle);
+        } catch (e) {
+            this.handleSaveError(e);
+        }
+    }
+    async saveToLastFile () {
+        try {
+            await this.saveToHandle(this.props.fileHandle);
+        } catch (e) {
+            this.handleSaveError(e);
+        }
+    }
+    saveToLastFileOrNew () {
+        if (this.props.fileHandle) {
+            return this.saveToLastFile();
+        }
+        return this.saveAsNew();
+    }
+    async saveToHandle (handle) {
+        // Obtain the writable very early, otherwise browsers won't give us the handle when we ask.
+        const writable = await FileSystemAPI.createWritable(handle);
+        try {
+            this.startedSaving();
+            const content = await this.props.saveProjectSb3();
+            await FileSystemAPI.writeToWritable(writable, content);
+            this.finishedSaving();
+        } finally {
+            // Always close the handle regardless of errors.
+            await FileSystemAPI.closeWritable(writable);
+        }
+    }
+    handleSaveError (e) {
+        // If user aborted process, do not show an error.
+        if (e && e.name === 'AbortError') {
+            return;
+        }
+        this.props.onShowSaveErrorAlert();
+        // eslint-disable-next-line no-console
+        console.error(e);
+        // eslint-disable-next-line no-alert
+        alert(this.props.intl.formatMessage(messages.error, {
+            error: `${e}`
+        }));
     }
     render () {
         const {
@@ -42,7 +118,18 @@ class SB3Downloader extends React.Component {
         } = this.props;
         return children(
             this.props.className,
-            this.downloadProject
+            this.downloadProject,
+            FileSystemAPI.available() ? {
+                available: true,
+                name: this.props.fileHandle ? this.props.fileHandle.name : null,
+                saveAsNew: this.saveAsNew,
+                saveToLastFile: this.saveToLastFile,
+                saveToLastFileOrNew: this.saveToLastFileOrNew,
+                smartSave: this.saveToLastFileOrNew
+            } : {
+                available: false,
+                smartSave: this.downloadProject
+            }
         );
     }
 }
@@ -57,10 +144,18 @@ const getProjectFilename = (curTitle, defaultTitle) => {
 
 SB3Downloader.propTypes = {
     children: PropTypes.func,
+    intl: intlShape,
     className: PropTypes.string,
+    fileHandle: PropTypes.shape({
+        name: PropTypes.string
+    }),
     onSaveFinished: PropTypes.func,
     projectFilename: PropTypes.string,
     saveProjectSb3: PropTypes.func,
+    onSetFileHandle: PropTypes.func,
+    onShowSavingAlert: PropTypes.func,
+    onShowSaveSuccessAlert: PropTypes.func,
+    onShowSaveErrorAlert: PropTypes.func,
     onProjectUnchanged: PropTypes.func
 };
 SB3Downloader.defaultProps = {
@@ -68,15 +163,20 @@ SB3Downloader.defaultProps = {
 };
 
 const mapStateToProps = state => ({
+    fileHandle: state.scratchGui.tw.fileHandle,
     saveProjectSb3: state.scratchGui.vm.saveProjectSb3.bind(state.scratchGui.vm),
     projectFilename: getProjectFilename(state.scratchGui.projectTitle, projectTitleInitialState)
 });
 
 const mapDispatchToProps = dispatch => ({
+    onSetFileHandle: fileHandle => dispatch(setFileHandle(fileHandle)),
+    onShowSavingAlert: () => showAlertWithTimeout(dispatch, 'saving'),
+    onShowSaveSuccessAlert: () => showAlertWithTimeout(dispatch, 'twSaveToDiskSuccess'),
+    onShowSaveErrorAlert: () => dispatch(showStandardAlert('savingError')),
     onProjectUnchanged: () => dispatch(setProjectUnchanged())
 });
 
-export default connect(
+export default injectIntl(connect(
     mapStateToProps,
     mapDispatchToProps
-)(SB3Downloader);
+)(SB3Downloader));

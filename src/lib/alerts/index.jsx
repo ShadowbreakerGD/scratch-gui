@@ -143,7 +143,7 @@ const alerts = [
     {
         alertId: 'saveSuccess',
         alertType: AlertTypes.INLINE,
-        clearList: ['saveSuccess', 'saving', 'savingError'],
+        clearList: ['saveSuccess', 'saving', 'savingError', 'twSaveToDiskSuccess'],
         content: (
             <FormattedMessage
                 defaultMessage="Project saved."
@@ -156,9 +156,24 @@ const alerts = [
         maxDisplaySecs: 3
     },
     {
+        alertId: 'twSaveToDiskSuccess',
+        alertType: AlertTypes.INLINE,
+        clearList: ['saveSuccess', 'saving', 'savingError', 'twSaveToDiskSuccess'],
+        content: (
+            <FormattedMessage
+                defaultMessage="Saved to your computer."
+                description="Message indicating that project was successfully saved to the user's disk"
+                id="tw.alerts.savedToDisk"
+            />
+        ),
+        iconURL: successImage,
+        level: AlertLevels.SUCCESS,
+        maxDisplaySecs: 3
+    },
+    {
         alertId: 'saving',
         alertType: AlertTypes.INLINE,
-        clearList: ['saveSuccess', 'saving', 'savingError'],
+        clearList: ['saveSuccess', 'saving', 'savingError', 'twSaveToDiskSuccess'],
         content: (
             <FormattedMessage
                 defaultMessage="Saving project…"
@@ -218,11 +233,48 @@ const alerts = [
         alertType: AlertTypes.STANDARD,
         clearList: [],
         content: (
-            <FormattedMessage
-                defaultMessage="Turn on Warp Timer or disable compiler (in Advanced menu) while creating projects to avoid potential data loss. Also note that scripts may need to be restarted for changes to apply."
-                description="Message warning user of potential data loss."
-                id="tw.alerts.warning"
-            />
+            <center>
+                <div>
+                    <FormattedMessage
+                        defaultMessage="Important Reminders"
+                        description="Header of the warning that appears when the editor is opened"
+                        id="tw.alerts.warning.top"
+                    />
+                </div>
+                <hr />
+                <div>
+                    <FormattedMessage
+                        defaultMessage="Save your project often, otherwise you will {loseAllYourWork} when the project crashes."
+                        description="Part of the warning that appears when the editor is opened"
+                        id="tw.alerts.warning.saveOften"
+                        values={{
+                            loseAllYourWork: <i>
+                                <FormattedMessage
+                                    defaultMessage="irrecoverably lose all of your work"
+                                    description="a harsh way to phrase losing all of one's work"
+                                    id="tw.alerts.warning.saveOften.loseAllYourWork"
+                                />
+                            </i>
+                        }}
+                    />
+                </div>
+                <hr />
+                <div>
+                    <FormattedMessage
+                        defaultMessage="Warp Timer has been enabled because you opened the editor. This fixes most crashes but hurts performance."
+                        description="Part of the warning that appears when the editor is opened"
+                        id="tw.alerts.warning.warpTimer"
+                    />
+                </div>
+                <hr />
+                <div>
+                    <FormattedMessage
+                        defaultMessage="Scripts may need to be restarted for changes to apply."
+                        description="Part of the warning that appears when the editor is opened"
+                        id="tw.alerts.warning.restartScripts"
+                    />
+                </div>
+            </center>
         ),
         closeButton: true,
         level: AlertLevels.WARN

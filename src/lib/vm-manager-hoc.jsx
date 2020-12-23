@@ -31,7 +31,7 @@ const vmManagerHOC = function (WrappedComponent) {
             if (!this.props.vm.initialized) {
                 this.audioEngine = new AudioEngine();
                 this.props.vm.attachAudioEngine(this.audioEngine);
-                this.props.vm.setCompatibilityMode(false); // tw: interpolated-60: interpolated 30 FPS needs to run at 60 ticks/s
+                this.props.vm.setCompatibilityMode(true);
                 this.props.vm.initialized = true;
                 this.props.vm.setLocale(this.props.locale, this.props.messages);
             }

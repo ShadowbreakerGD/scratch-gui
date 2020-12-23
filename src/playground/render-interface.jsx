@@ -66,7 +66,7 @@ const Interface = ({
                             </div>
                         ) : null}
                         <div className={styles.section}>
-                            <p>This is an experiment that tries to make projects run at 60 FPS without making them run too fast by interpolating every other frame.</p>
+                            <p>This is an experiment that tries to make projects run at higher framerates without changing the project's timing by interpolating frames.</p>
                             <ul>
                                 <li>An imperfect heuristic is used to determine whether movement should be interpolated.</li>
                                 <li>Pen and some effects won't be interpolated.</li>

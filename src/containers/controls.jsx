@@ -21,6 +21,13 @@ class Controls extends React.Component {
             if (e.shiftKey) {
                 this.props.vm.setTurboMode(!this.props.turbo);
             }
+            if (e.altKey || e.type === 'contextmenu') {
+                if (this.props.framerate === 30) {
+                    this.props.vm.setFramerate(60);
+                } else {
+                    this.props.vm.setFramerate(30);
+                }
+            }
         } else {
             if (!this.props.isStarted) {
                 this.props.vm.start();

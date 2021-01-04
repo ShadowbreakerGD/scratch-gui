@@ -32,6 +32,7 @@ import HighQualityPen from '../../containers/tw-high-quality-pen.jsx';
 import ChangeUsername from '../../containers/tw-change-username.jsx';
 import CloudVariablesToggler from '../../containers/tw-cloud-toggler.jsx';
 import VMOptions from '../../containers/tw-vm-options.jsx';
+import TWAutoSaveLoader from '../../containers/tw-autosave-loader.jsx';
 import TWSaveStatus from './tw-save-status.jsx';
 
 import {openTipsLibrary} from '../../reducers/modals';
@@ -279,7 +280,7 @@ class MenuBar extends React.Component {
     handleKeyPress (event) {
         const modifier = bowser.mac ? event.metaKey : event.ctrlKey;
         if (modifier && event.key === 's') {
-            this.props.onClickSave();
+            // tw: disable Ctrl+S for now until it can be hooked up to the proper API
             event.preventDefault();
         }
     }
@@ -578,6 +579,20 @@ class MenuBar extends React.Component {
                                             </React.Fragment>
                                         )}</SB3Downloader>
                                     </MenuSection>
+                                    <MenuSection>
+                                        <TWAutoSaveLoader>{(className, loadAutoSave) => (
+                                            <MenuItem
+                                                className={className}
+                                                onClick={loadAutoSave}
+                                            >
+                                                <FormattedMessage
+                                                    defaultMessage="Load autosave (BETA)"
+                                                    description="Menu bar item for loading an autosave"
+                                                    id="tw.menuBar.loadAutoSave"
+                                                />
+                                            </MenuItem>
+                                        )}</TWAutoSaveLoader>
+                                    </MenuSection>
                                 </MenuBarMenu>
                             </div>
                         )}
@@ -834,6 +849,13 @@ class MenuBar extends React.Component {
                                             defaultMessage="Embedding"
                                             description="Menu bar item for embedding link"
                                             id="tw.menuBar.embed"
+                                        />
+                                    </MenuItemLink>
+                                    <MenuItemLink href="https://github.com/TurboWarp/scratch-gui/wiki/TurboWarp-blocks">
+                                        <FormattedMessage
+                                            defaultMessage="TurboWarp Blocks"
+                                            description="Menu bar item for TurboWarp blocks link"
+                                            id="tw.menuBar.blocks"
                                         />
                                     </MenuItemLink>
                                     <MenuItemLink href="https://github.com/TurboWarp/scratch-gui/wiki/URL-Parameters">

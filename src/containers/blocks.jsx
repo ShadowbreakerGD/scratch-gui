@@ -32,7 +32,7 @@ import {
     SOUNDS_TAB_INDEX
 } from '../reducers/editor-tab';
 
-import s3devtoolsloader from './tw-s3-dev-tools-loader';
+import loadAddons from '../addons/loader';
 
 const addFunctionListener = (object, property, callback) => {
     const oldFn = object[property];
@@ -51,6 +51,7 @@ class Blocks extends React.Component {
     constructor (props) {
         super(props);
         this.ScratchBlocks = VMScratchBlocks(props.vm);
+        window.ScratchBlocks = this.ScratchBlocks;
         bindAll(this, [
             'attachVM',
             'detachVM',
@@ -163,9 +164,9 @@ class Blocks extends React.Component {
             this.requestToolboxUpdate();
         }
 
-        // load dev tools when editor is visible
+        // tw: load addons when editor is visible
         if (this.props.isVisible) {
-            s3devtoolsloader.load();
+            loadAddons();
         }
 
         if (this.props.isVisible === prevProps.isVisible) {

@@ -7,7 +7,7 @@ import {projectTitleInitialState} from '../reducers/project-title';
 import downloadBlob from '../lib/download-blob';
 import {setProjectUnchanged} from '../reducers/project-changed';
 import {showStandardAlert, showAlertWithTimeout} from '../reducers/alerts';
-import {setFileHandle} from '../reducers/tw';
+import {setFileHandle, setShowedExtendedExtensionsWarning} from '../reducers/tw';
 import FileSystemAPI from '../lib/tw-filesystem-api';
 
 // tw: we make some extensive changes to file saving
@@ -60,6 +60,11 @@ class SB3Downloader extends React.Component {
     downloadProject () {
         this.startedSaving();
         this.props.saveProjectSb3().then(content => {
+            if (content.usesExtendedExtensions) {
+                if (!this.props.showedExtendedExtensionsWarning) {
+                    this.props.onShowExtendedExtensionsWarning();
+                }
+            }
             this.finishedSaving();
             downloadBlob(this.props.projectFilename, content);
         });
@@ -152,6 +157,8 @@ SB3Downloader.propTypes = {
     onSaveFinished: PropTypes.func,
     projectFilename: PropTypes.string,
     saveProjectSb3: PropTypes.func,
+    showedExtendedExtensionsWarning: PropTypes.bool,
+    onShowExtendedExtensionsWarning: PropTypes.func,
     onSetFileHandle: PropTypes.func,
     onShowSavingAlert: PropTypes.func,
     onShowSaveSuccessAlert: PropTypes.func,
@@ -165,11 +172,16 @@ SB3Downloader.defaultProps = {
 const mapStateToProps = state => ({
     fileHandle: state.scratchGui.tw.fileHandle,
     saveProjectSb3: state.scratchGui.vm.saveProjectSb3.bind(state.scratchGui.vm),
-    projectFilename: getProjectFilename(state.scratchGui.projectTitle, projectTitleInitialState)
+    projectFilename: getProjectFilename(state.scratchGui.projectTitle, projectTitleInitialState),
+    showedExtendedExtensionsWarning: state.scratchGui.tw.showedExtendedExtensionsWarning
 });
 
 const mapDispatchToProps = dispatch => ({
     onSetFileHandle: fileHandle => dispatch(setFileHandle(fileHandle)),
+    onShowExtendedExtensionsWarning: () => {
+        dispatch(showStandardAlert('twExtendedExtensionsWarning'));
+        dispatch(setShowedExtendedExtensionsWarning(true));
+    },
     onShowSavingAlert: () => showAlertWithTimeout(dispatch, 'saving'),
     onShowSaveSuccessAlert: () => showAlertWithTimeout(dispatch, 'twSaveToDiskSuccess'),
     onShowSaveErrorAlert: () => dispatch(showStandardAlert('savingError')),

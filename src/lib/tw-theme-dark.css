@@ -1,0 +1,96 @@
+/* GUI */
+:root {
+    background: #111;
+    color: #eee;
+    /* see colors.csss */
+    --ui-primary: rgb(17, 17, 17);
+    --ui-secondary: rgb(30, 30, 30);
+    --ui-tertiary: rgb(46, 46, 46);
+    --ui-modal-overlay: #333a;
+    --text-primary: #eee;
+}
+
+/* Blockly */
+.blocklySvg {
+    background-color: var(--ui-secondary) !important;
+}
+.blocklyMainBackground {
+    fill: var(--ui-secondary) !important;
+}
+.blocklyFlyoutBackground {
+    fill: #111;
+}
+.blocklyFlyoutLabelText {
+    fill: #ccc;
+}
+.blocklyFlyoutButton .blocklyText {
+    fill: #ccc;
+}
+.blocklyFlyoutButton:hover {
+    fill: #111;
+}
+.scratchCategoryMenu {
+    color: #ccc;
+}
+.blocklyToolboxDiv,
+.scratchCategoryMenu {
+    background: #111 !important;
+}
+.blocklyScrollbarHandle {
+    fill: #666;
+}
+.blocklyZoom {
+    /* TODO: does not work in chrome */
+    filter: invert(100%);
+}
+.scratchCategoryMenuItem.categorySelected {
+    background: var(--ui-secondary);
+}
+.valueReportBox {
+    color: black;
+}
+
+/* Paint */
+[class*="input_input-form"] {
+    background-color: var(--ui-secondary);
+    border-color: var(--ui-tertiary);
+    color: var(--text-primary);
+}
+img[class*="tool-select-base_tool-select-icon"] {
+    filter: brightness(1.7);
+}
+[class*="paint-editor_button-group-button-icon"] {
+    filter: brightness(1.7);
+}
+[class*="dropdown_mod-open"] {
+    background: var(--ui-secondary);
+}
+[class*="dropdown_dropdown"],
+[class*="fixed-tools_mod-dashed-border"],
+[class*="mode-tools_mod-dashed-border"],
+[class*="paint-editor_mod-dashed-border"],
+[class*="paint-editor_editor-container-top"],
+[class*="paint-editor_button-group-button"],
+[class*="paint-editor_canvas-container"],
+[class*="color-picker_swatch"],
+[class*="fixed-tools_button-group-button"],
+[class*="color-picker_divider"] {
+    border-color: var(--ui-tertiary) !important;
+}
+[class*="font-dropdown_font-dropdown"] {
+    color: var(--text-primary);
+}
+[class*="color-picker_row-header"] {
+    color: #ccc;
+}
+
+/* Other / Multipurpose */
+.Popover-body {
+    background: var(--ui-secondary);
+    border-color: var(--ui-tertiary);
+    color: var(--text-primary);
+}
+.Popover-tipShape {
+    fill: var(--ui-secondary);
+    stroke: var(--ui-tertiary);
+}

@@ -16,7 +16,6 @@ import ShareButton from './share-button.jsx';
 import {ComingSoonTooltip} from '../coming-soon/coming-soon.jsx';
 import Divider from '../divider/divider.jsx';
 import LanguageSelector from '../../containers/language-selector.jsx';
-import SBFileUploader from '../../containers/sb-file-uploader.jsx';
 import ProjectWatcher from '../../containers/project-watcher.jsx';
 import MenuBarMenu from './menu-bar-menu.jsx';
 import {MenuItem, MenuSection} from '../menu/menu.jsx';
@@ -27,7 +26,7 @@ import DeletionRestorer from '../../containers/deletion-restorer.jsx';
 import TurboMode from '../../containers/turbo-mode.jsx';
 import MenuBarHOC from '../../containers/menu-bar-hoc.jsx';
 
-import SixtyFPSToggler from '../../containers/tw-sixty-fps-toggler.jsx';
+import FramerateChanger from '../../containers/tw-framerate-changer.jsx';
 import HighQualityPen from '../../containers/tw-high-quality-pen.jsx';
 import ChangeUsername from '../../containers/tw-change-username.jsx';
 import CloudVariablesToggler from '../../containers/tw-cloud-toggler.jsx';
@@ -280,7 +279,7 @@ class MenuBar extends React.Component {
     handleKeyPress (event) {
         const modifier = bowser.mac ? event.metaKey : event.ctrlKey;
         if (modifier && event.key === 's') {
-            // tw: disable Ctrl+S for now until it can be hooked up to the proper API
+            this.props.handleSaveProject();
             event.preventDefault();
         }
     }
@@ -412,8 +411,17 @@ class MenuBar extends React.Component {
                             </div>
                             <LanguageSelector label={this.props.intl.formatMessage(ariaMessages.language)} />
                         </div>)}
+                        {/* tw: theme toggler */}
+                        {this.props.onClickTheme && (
+                            <div
+                                className={classNames(styles.menuBarItem, styles.hoverable)}
+                                onMouseUp={this.props.onClickTheme}
+                            >
+                                <div className={styles.themeIcon} />
+                            </div>
+                        )}
                         {/* tw: display compile errors */}
-                        {this.props.compileErrors.length > 0 && <div className={styles.fileGroup}>
+                        {this.props.compileErrors.length > 0 && <div>
                             <div
                                 className={classNames(styles.menuBarItem, styles.hoverable, {
                                     [styles.active]: this.props.errorsMenuOpen
@@ -511,22 +519,11 @@ class MenuBar extends React.Component {
                                         </MenuSection>
                                     )}
                                     <MenuSection>
-                                        <SBFileUploader
-                                            canSave={this.props.canSave}
-                                            userOwnsProject={this.props.userOwnsProject}
+                                        <MenuItem
+                                            onClick={this.props.onStartSelectingFileUpload}
                                         >
-                                            {(className, renderFileInput, handleLoadProject) => (
-                                                <MenuItem
-                                                    className={className}
-                                                    onClick={handleLoadProject}
-                                                >
-                                                    {/* eslint-disable max-len */}
-                                                    {this.props.intl.formatMessage(sharedMessages.loadFromComputerTitle)}
-                                                    {/* eslint-enable max-len */}
-                                                    {renderFileInput()}
-                                                </MenuItem>
-                                            )}
-                                        </SBFileUploader>
+                                            {this.props.intl.formatMessage(sharedMessages.loadFromComputerTitle)}
+                                        </MenuItem>
                                         <SB3Downloader>{(_className, downloadProject, extended) => (
                                             <React.Fragment>
                                                 {extended.available && (
@@ -643,9 +640,9 @@ class MenuBar extends React.Component {
                                             )}
                                         </MenuItem>
                                     )}</TurboMode>
-                                    <SixtyFPSToggler>{(toggleSixtyFPS, {isSixty}) => (
-                                        <MenuItem onClick={toggleSixtyFPS}>
-                                            {isSixty ? (
+                                    <FramerateChanger>{(changeFramerate, {framerate}) => (
+                                        <MenuItem onClick={changeFramerate}>
+                                            {framerate === 60 ? (
                                                 <FormattedMessage
                                                     defaultMessage="Turn off 60 FPS Mode"
                                                     description="Menu bar item for turning off 60 FPS mode"
@@ -659,7 +656,7 @@ class MenuBar extends React.Component {
                                                 />
                                             )}
                                         </MenuItem>
-                                    )}</SixtyFPSToggler>
+                                    )}</FramerateChanger>
                                     <ChangeUsername>{changeUsername => (
                                         <MenuItem onClick={changeUsername}>
                                             <FormattedMessage
@@ -700,8 +697,20 @@ class MenuBar extends React.Component {
                                 </MenuSection>
                             </MenuBarMenu>
                         </div>
-                    </div>
-                    <div className={styles.fileGroup}>
+                        {this.props.onClickAddonSettings && (
+                            <div
+                                className={classNames(styles.menuBarItem, styles.hoverable)}
+                                onMouseUp={this.props.onClickAddonSettings}
+                            >
+                                <div className={classNames(styles.addonsMenu)}>
+                                    <FormattedMessage
+                                        defaultMessage="Addons"
+                                        description="Menu bar item for addon settings"
+                                        id="tw.menuBar.addons"
+                                    />
+                                </div>
+                            </div>
+                        )}
                         <div
                             className={classNames(styles.menuBarItem, styles.hoverable, {
                                 [styles.active]: this.props.settingsMenuOpen
@@ -843,6 +852,10 @@ class MenuBar extends React.Component {
                                             description="Link to privacy policy"
                                             id="tw.privacy"
                                         />
+                                    </MenuItemLink>
+                                    <MenuItemLink href="https://desktop.turbowarp.org/">
+                                        {/* This is not a FormattedMessage because it should not be translated. */}
+                                        {'TurboWarp Desktop'}
                                     </MenuItemLink>
                                     <MenuItemLink href="https://github.com/TurboWarp/scratch-gui/wiki/Embedding">
                                         <FormattedMessage
@@ -1013,6 +1026,7 @@ MenuBar.propTypes = {
     editMenuOpen: PropTypes.bool,
     enableCommunity: PropTypes.bool,
     fileMenuOpen: PropTypes.bool,
+    handleSaveProject: PropTypes.func,
     intl: intlShape,
     isPlayerOnly: PropTypes.bool,
     isRtl: PropTypes.bool,
@@ -1025,6 +1039,8 @@ MenuBar.propTypes = {
     logo: PropTypes.string,
     onClickAbout: PropTypes.func,
     onClickAccount: PropTypes.func,
+    onClickAddonSettings: PropTypes.func,
+    onClickTheme: PropTypes.func,
     onClickEdit: PropTypes.func,
     onClickFile: PropTypes.func,
     onClickLanguage: PropTypes.func,
@@ -1051,6 +1067,7 @@ MenuBar.propTypes = {
     onRequestCloseLogin: PropTypes.func,
     onSeeCommunity: PropTypes.func,
     onShare: PropTypes.func,
+    onStartSelectingFileUpload: PropTypes.func,
     onToggleLoginOpen: PropTypes.func,
     projectId: PropTypes.string,
     projectTitle: PropTypes.string,

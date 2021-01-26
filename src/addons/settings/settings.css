@@ -1,0 +1,544 @@
+/*
+Copyright (c) 2021 Thomas Weber
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+body {
+    background-color: white;
+    color: black;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    margin: 0;
+}
+body[theme="dark"] {
+    background-color: #222222;
+    color: white;
+}
+
+a[href] {
+    color: #2a67eb;
+    text-decoration: underline;
+}
+[theme="dark"] a[href] {
+    color: #6d9bff;
+}
+
+.container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    position: relative;
+    padding: 8px 20px;
+    background-color: #fcfcfc;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+[theme="dark"] .header {
+    background-color: #222222;
+}
+@media (max-width: 550px) {
+    .header {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+}
+
+.button {
+    color: #000;
+    background: #efefef;
+    border: 1px solid #acacac;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: 0.25s ease;
+    outline: none;
+    height: 32px;
+    font-family: inherit;
+    font-size: 14px;
+}
+[theme="dark"] .button {
+    color: #fff;
+    background: #222222;
+    border-color: #000;
+}
+.button:hover {
+    background: #aaaaaa;
+}
+[theme="dark"] .button:hover {
+    background: #151515;
+}
+.button:active, .button:focus-within {
+    box-shadow: 0 0 0 3px #ff4c4c5d;
+}
+
+.search-container {
+    display: flex;
+    background-color: #f0f0f0;
+    color: #222;
+    border: 1px solid #cecece;
+    border-radius: 4px;
+}
+.search-container:focus-within {
+    border-color: #222;
+}
+.search-input {
+    color: inherit;
+    width: 150px;
+    height: 16px;
+    padding: 10px 15px;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    font-size: 14px;
+}
+.search-button {
+    height: 36px;
+    width: 36px;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    background-color: transparent;
+    background-image: url("./search.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+}
+[theme="dark"] .search-container {
+    color: white;
+    background-color: #111111;
+    border-color: #222222;
+}
+[theme="dark"] .search-container:focus-within {
+    border-color: #444;
+}
+[theme="dark"] .search-button {
+    filter: invert(100%);
+}
+
+.addons {
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 10px 20px;
+    height: 100%;
+}
+@media (max-width: 550px) {
+    .addons {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+}
+
+.addon {
+    background: #f7f7f7;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border: 1px solid #cfcfcf;
+    border-radius: 5px;
+    margin: 10px 0 10px 0;
+    font-size: 14px;
+}
+.addon-dirty {
+    background: #ffeedf;
+}
+[theme="dark"] .addon {
+    background-color: #2a2a2a;
+    border-color: #333;
+}
+[theme="dark"] .addon-dirty {
+    background: rgb(39, 50, 53);
+}
+
+.addon-header {
+    padding: 0 10px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+}
+
+.extension-image {
+    height: 16px;
+    width: 16px;
+    margin-right: 8px;
+}
+[theme="dark"] .extension-image {
+    filter: invert(100%);
+}
+
+.addon-title {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+}
+.addon-title-text {
+
+}
+
+.inline-description {
+    margin-left: 10px;
+    color: gray;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.addon-operations {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+}
+
+.reset-button {
+    display: block;
+    margin-right: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+}
+.reset-button:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+.reset-button:active, .reset-button:focus-within {
+    outline: none;
+    box-shadow: 0 0 0 3px #ff4c4c5d;
+}
+.reset-button-image {
+    height: 16px;
+    width: 16px;
+}
+[theme="dark"] .reset-button-image {
+    filter: invert(100%);
+}
+[theme="dark"] .reset-button:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.switch {
+    display: block;
+    background: #111;
+    width: 40px;
+    height: 20px;
+    border: none;
+    border-radius: 10px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+.switch[state="on"] {
+    background: #ff4c4c;
+}
+.switch::before {
+    content: "";
+    position: absolute;
+    display: block;
+    width: 10px;
+    height: 10px;
+    background: #fff;
+    border-radius: 5px;
+    top: 5px;
+    left: 5px;
+    transition: all 0.25s ease;
+}
+[theme="dark"] .switch::before {
+    background: #aaa;
+}
+.switch[state="on"]::before {
+    background: #fff;
+    left: 25px;
+}
+.switch:active, .switch:focus-within {
+    outline: none;
+    box-shadow: 0 0 0 3px #ff4c4c5d;
+}
+
+.tag-container {
+    display: flex;
+    align-items: center;
+}
+.tag {
+    border-radius: 4px;
+    padding: 2px 5px;
+    margin-left: 10px;
+    border-bottom: 2px solid #111;
+}
+.tag-recommended {
+    color: white;
+    background-color: #175ef8;
+    border-color: #0e44b8;
+}
+.tag-beta {
+    color: white;
+    background-color: #fd662b;
+    border-color: #d84a12;
+}
+.tag-easter-egg {
+    color: black;
+    background-color: #b9f38d;
+    border-color: #8fce5e;
+}
+.tag-turbowarp {
+    color: white;
+    background: #ff4c4c;
+    border-color: rgb(185, 38, 38);
+}
+@media (max-width: 550px) {
+    .tag:not(.tag-beta) {
+        display: none;
+    }
+}
+
+.addon-details {
+    padding: 0 20px;
+    margin-bottom: 10px;
+    color: #111;
+}
+[theme="dark"] .addon-details {
+    color: #ddd;
+}
+
+.credit-container {
+
+}
+.credit-title {
+    padding-right: 5px;
+}
+.credit {
+
+}
+
+.description {
+
+}
+
+.notice-container {
+
+}
+.notice {
+    color: black;
+    padding: 10px;
+    background: rgba(255, 235, 59, 0.7);
+    border-radius: 5px;
+    font-weight: bold;
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+}
+.notice-icon {
+    height: 16px;
+    margin-right: 10px;
+}
+
+.setting-container {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.setting {
+    margin: 10px;
+    margin-right: 20px;
+    min-height: 35px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.setting-label {
+    font-weight: bold;
+    width: 200px;
+    text-transform: uppercase;
+    color: #555;
+    font-size: 12px;
+    margin-right: 10px;
+}
+[theme="dark"] .setting-label {
+    color: #aaa;
+}
+.setting input {
+    color: #000;
+    background: #efefef;
+    border: 1px solid #acacac;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: 0.25s ease;
+}
+[theme="dark"] .setting input {
+    color: #fff;
+    background: #222222;
+    border: 1px solid #000;
+}
+.setting input:focus, .setting input:active {
+    outline: none;
+    border-color: #ff4c4c;
+    box-shadow: 0 0 0 3px #ff4c4c5d;
+}
+.setting input[type="checkbox"] {
+    height: 20px;
+    width: 20px;
+    padding: 0;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: white;
+    background-size: 20px 20px;
+    background-position: center center;
+}
+.setting input[type="checkbox"]:checked {
+    background-color: #175ef8;
+    background-image: url("./check.svg");
+}
+.setting input[type="checkbox"]:hover:not(:focus) {
+    border-color: #0e44b8;
+}
+.setting input[type="number"] {
+    border-radius: 20px;
+    font-size: 14px;
+}
+.setting input[type="color"] {
+    height: 30px;
+    width: 100px;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    outline: none;
+    border: 1px solid transparent;
+    border-radius: 4px 0px 0px 4px;
+}
+.reset-color-button {
+    border-radius: 0 4px 4px 0px;
+    box-sizing: border-box;
+    height: 30px;
+}
+.select {
+    display: flex;
+}
+.select-option {
+    cursor: pointer;
+    padding: 10px;
+    margin: 0;
+    background: transparent;
+    border: none;
+    background: #f0f0f0;
+    color: #000;
+    border: 1px solid #aaa;
+    border-right-width: 0;
+    transition: 0.25s ease;
+}
+[theme="dark"] .select-option {
+    color: #fff;
+    background: #222222;
+    border-color: #000000;
+}
+.select-option:first-child {
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+.select-option:last-child {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-right-width: 1px;
+}
+.select-option.selected {
+    color: white;
+    background: #ff4c4c;
+}
+.select-option:active, .select-option:focus-within {
+    outline: none;
+    box-shadow: 0 0 0 3px #ff4c4c5d;
+}
+
+.presets {
+    width: 100%;
+}
+.preset-button {
+    margin-right: 10px;
+}
+
+.unsupported-container {
+    margin-bottom: 10px;
+    color: #444;
+}
+[theme="dark"] .unsupported-container {
+    color: #aaa;
+}
+.unsupported-addon {
+    padding-left: 5px;
+}
+
+.footer-buttons {
+    margin-bottom: 10px;
+}
+.footer-buttons > .button {
+    margin-right: 10px;
+}
+.reset-all-button {
+
+}
+.export-button {
+
+}
+.import-button {
+
+}
+
+.no-results {
+    text-align: center;
+    font-style: italic;
+}
+
+.dirty-outer {
+    display: flex;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    z-index: 10;
+    justify-content: center;
+    animation: dirty-appear 0.2s ease;
+    pointer-events: none;
+    margin-top: 2px;
+}
+.dirty-inner {
+    padding: 8px;
+    background: #ffeedf;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border: 1px solid #cfcfcf;
+    border-radius: 4px;
+    pointer-events: auto;
+}
+[theme="dark"] .dirty-inner {
+    background: rgb(39, 50, 53);
+    border-color: #222;
+}
+
+.dirty-button {
+    margin-left: 6px;
+}
+
+@keyframes dirty-appear {
+    from {
+        transform: translateY(-100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}

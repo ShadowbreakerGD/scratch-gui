@@ -35,7 +35,8 @@ const base = {
                 {from: /^\/\d+\/?$/, to: '/index.html'},
                 {from: /^\/\d+\/fullscreen\/?$/, to: '/fullscreen.html'},
                 {from: /^\/\d+\/editor\/?$/, to: '/editor.html'},
-                {from: /^\/\d+\/embed\/?$/, to: '/embed.html'}
+                {from: /^\/\d+\/embed\/?$/, to: '/embed.html'},
+                {from: /^\/addons\/?$/, to: '/addons.html'}
             ]
         }
     },
@@ -117,7 +118,8 @@ module.exports = [
             editor: './src/playground/editor.jsx',
             player: './src/playground/player.jsx',
             fullscreen: './src/playground/fullscreen.jsx',
-            embed: './src/playground/embed.jsx'
+            embed: './src/playground/embed.jsx',
+            'addon-settings': './src/playground/addon-settings.jsx'
         },
         output: {
             path: path.resolve(__dirname, 'build')
@@ -182,6 +184,13 @@ module.exports = [
                 template: 'src/playground/index.ejs',
                 filename: 'embed.html',
                 title: 'Embedded Project - TurboWarp',
+                ...htmlWebpackPluginCommon
+            }),
+            new HtmlWebpackPlugin({
+                chunks: ['addon-settings'],
+                template: 'src/playground/index.ejs',
+                filename: 'addons.html',
+                title: 'Addon Settings - TurboWarp',
                 ...htmlWebpackPluginCommon
             }),
             new HtmlWebpackPlugin({

@@ -94,6 +94,8 @@ const GUIComponent = props => {
         onClickAbout,
         onClickAccountNav,
         onCloseAccountNav,
+        onClickAddonSettings,
+        onClickTheme,
         onLogOut,
         onOpenRegistration,
         onToggleLoginOpen,
@@ -109,6 +111,7 @@ const GUIComponent = props => {
         onSeeCommunity,
         onShare,
         onShowPrivacyPolicy,
+        onStartSelectingFileUpload,
         onTelemetryModalCancel,
         onTelemetryModalOptIn,
         onTelemetryModalOptOut,
@@ -177,10 +180,13 @@ const GUIComponent = props => {
                     />
                 ) : null}
                 {loading ? (
-                    <Loader />
+                    <Loader isFullScreen />
                 ) : null}
                 {isCreating ? (
-                    <Loader messageId="gui.loader.creating" />
+                    <Loader
+                        isFullScreen
+                        messageId="gui.loader.creating"
+                    />
                 ) : null}
                 {isRendererSupported ? null : (
                     <WebGlModal isRtl={isRtl} />
@@ -232,6 +238,8 @@ const GUIComponent = props => {
                     showComingSoon={showComingSoon}
                     onClickAbout={onClickAbout}
                     onClickAccountNav={onClickAccountNav}
+                    onClickAddonSettings={onClickAddonSettings}
+                    onClickTheme={onClickTheme}
                     onClickLogo={onClickLogo}
                     onCloseAccountNav={onCloseAccountNav}
                     onLogOut={onLogOut}
@@ -239,6 +247,7 @@ const GUIComponent = props => {
                     onProjectTelemetryEvent={onProjectTelemetryEvent}
                     onSeeCommunity={onSeeCommunity}
                     onShare={onShare}
+                    onStartSelectingFileUpload={onStartSelectingFileUpload}
                     onToggleLoginOpen={onToggleLoginOpen}
                 />
                 <Box className={styles.bodyWrapper}>
@@ -406,6 +415,8 @@ GUIComponent.propTypes = {
     onActivateTab: PropTypes.func,
     onClickAbout: PropTypes.func,
     onClickAccountNav: PropTypes.func,
+    onClickAddonSettings: PropTypes.func,
+    onClickTheme: PropTypes.func,
     onClickLogo: PropTypes.func,
     onCloseAccountNav: PropTypes.func,
     onExtensionButtonClick: PropTypes.func,
@@ -417,6 +428,7 @@ GUIComponent.propTypes = {
     onSeeCommunity: PropTypes.func,
     onShare: PropTypes.func,
     onShowPrivacyPolicy: PropTypes.func,
+    onStartSelectingFileUpload: PropTypes.func,
     onTabSelect: PropTypes.func,
     onTelemetryModalCancel: PropTypes.func,
     onTelemetryModalOptIn: PropTypes.func,

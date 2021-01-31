@@ -30,6 +30,7 @@ import TWStateManagerHOC from '../lib/tw-state-manager-hoc.jsx';
 import TWThemeHOC from '../lib/tw-theme-hoc.jsx';
 import SBFileUploaderHOC from '../lib/sb-file-uploader-hoc.jsx';
 import SettingsStore from '../addons/settings-store';
+import twStageSize from '../lib/tw-stage-size';
 
 import GUI from './render-gui.jsx';
 import MenuBar from '../components/menu-bar/menu-bar.jsx';
@@ -64,13 +65,20 @@ const handleClickAddonSettings = () => {
     window.open(`${process.env.ROOT}${path}`);
 };
 
-const handleLoadAddons = () => {
-    import(/* webpackChunkName: "addons" */ '../addons/entry');
+const initialTitle = document.title;
+const handleUpdateProjectTitle = (title, isDefault) => {
+    if (isDefault || !title) {
+        document.title = initialTitle;
+    } else {
+        document.title = `${title} - TurboWarp`;
+    }
 };
 
 const WrappedMenuBar = compose(
     SBFileUploaderHOC
 )(MenuBar);
+
+import(/* webpackChunkName: "addons" */ '../addons/entry');
 
 const Interface = ({
     description,
@@ -84,19 +92,26 @@ const Interface = ({
             {isHomepage ? (
                 <div className={styles.menu}>
                     <WrappedMenuBar
-                        canManageFiles
                         canChangeLanguage
+                        canManageFiles
                         enableSeeInside
+                        onClickAddonSettings={handleClickAddonSettings}
                         onClickTheme={onClickTheme}
                     />
                 </div>
             ) : null}
-            <div className={styles.center}>
+            <div
+                className={styles.center}
+                style={isPlayerOnly ? ({
+                    // add a couple pixels to account for border (TODO: remove weird hack)
+                    width: `${twStageSize.width + 2}px`
+                }) : null}
+            >
                 {isHomepage && announcement ? <DOMElementRenderer domElement={announcement} /> : null}
                 <GUI
                     onClickAddonSettings={handleClickAddonSettings}
-                    onLoadAddons={handleLoadAddons}
                     onClickTheme={onClickTheme}
+                    onUpdateProjectTitle={handleUpdateProjectTitle}
                 />
                 {isHomepage ? (
                     <React.Fragment>

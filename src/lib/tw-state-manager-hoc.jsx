@@ -358,7 +358,10 @@ const TWStateManager = function (WrappedComponent) {
             }
 
             for (const extension of urlParams.getAll('extension')) {
-                this.props.vm.extensionManager.loadExtensionURL(extension);
+                // This is temporary until we feel more comfortable about the idea of running remote code in a Worker.
+                if (confirm(`Load extension: ${extension}`)) {
+                    this.props.vm.extensionManager.loadExtensionURL(extension);
+                }
             }
 
             const routerCallbacks = {
@@ -404,6 +407,15 @@ const TWStateManager = function (WrappedComponent) {
                 const searchParams = new URLSearchParams(location.search);
                 const runtimeOptions = this.props.runtimeOptions;
                 const compilerOptions = this.props.compilerOptions;
+
+                // Always remove legacy parameter
+                searchParams.delete('60fps');
+
+                if (this.props.framerate === 30) {
+                    searchParams.delete('fps');
+                } else {
+                    searchParams.set('fps', this.props.framerate);
+                }
 
                 if (this.props.turbo) {
                     searchParams.set('turbo', '');

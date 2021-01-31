@@ -28,9 +28,12 @@ import upstreamMeta from '../upstream-meta.json';
 import {detectLocale} from '../../lib/detect-locale';
 import {getInitialDarkMode} from '../../lib/tw-theme-hoc.jsx';
 import SettingsStore from '../settings-store';
-import extensionImage from './extension.svg';
-import brushImage from './brush.svg';
-import undoImage from './undo.svg';
+import extensionImageWhite from './extension-white.svg';
+import extensionImageBlack from './extension-black.svg';
+import brushImageWhite from './brush-white.svg';
+import brushImageBlack from './brush-black.svg';
+import undoImageWhite from './undo-white.svg';
+import undoImageBlack from './undo-black.svg';
 import infoImage from './info.svg';
 import styles from './settings.css';
 
@@ -60,13 +63,19 @@ const AddonCreditsComponent = ({credits}) => (
                 className={styles.credit}
                 key={index}
             >
-                <a
-                    href={author.link}
-                    target="_blank"
-                    rel="noreferrer"
-                >
-                    {author.name}
-                </a>
+                {author.link ? (
+                    <a
+                        href={author.link}
+                        target="_blank"
+                        rel="noreferrer"
+                    >
+                        {author.name}
+                    </a>
+                ) : (
+                    <span>
+                        {author.name}
+                    </span>
+                )}
                 {isLast ? null : ', '}
             </span>
         );
@@ -130,6 +139,11 @@ const TagComponent = ({tags}) => tags.length > 0 && (
         {tags.includes('recommended') && (
             <span className={classNames(styles.tag, styles.tagRecommended)}>
                 {settingsTranslations['tw.addons.settings.tags.recommended']}
+            </span>
+        )}
+        {tags.includes('theme') && (
+            <span className={classNames(styles.tag, styles.tagTheme)}>
+                {settingsTranslations['tw.addons.settings.tags.theme']}
             </span>
         )}
         {tags.includes('beta') && (
@@ -302,7 +316,8 @@ const NoticeComponent = ({
     notice
 }) => {
     const noticeId = notice.id;
-    // All themes require reloads. Users are already informed of this in other places of the UI
+    // All themes require reload, so ignore these alerts from upstream.
+    // Users are already informed of this in other places of the UI.
     if (noticeId === 'refresheditor') {
         return null;
     }
@@ -380,13 +395,13 @@ const AddonComponent = ({
                 {manifest.tags && manifest.tags.includes('theme') ? (
                     <img
                         className={styles.extensionImage}
-                        src={brushImage}
+                        src={theme === 'dark' ? brushImageWhite : brushImageBlack}
                         alt=""
                     />
                 ) : (
                     <img
                         className={styles.extensionImage}
-                        src={extensionImage}
+                        src={theme === 'dark' ? extensionImageWhite : extensionImageBlack}
                         alt=""
                     />
                 )}
@@ -412,7 +427,7 @@ const AddonComponent = ({
                         title={settingsTranslations['tw.addons.settings.reset']}
                     >
                         <img
-                            src={undoImage}
+                            src={theme === 'dark' ? undoImageWhite : undoImageBlack}
                             className={styles.resetButtonImage}
                             alt={settingsTranslations['tw.addons.settings.reset']}
                         />
@@ -656,6 +671,9 @@ class AddonSettingsComponent extends React.Component {
                 const text = await file.text();
                 const data = JSON.parse(text);
                 SettingsStore.import(data);
+                this.setState({
+                    search: ''
+                });
             } catch (e) {
                 console.error(e);
                 alert(e);
@@ -781,6 +799,16 @@ class AddonSettingsComponent extends React.Component {
                         />
                         <div className={styles.searchButton} />
                     </label>
+                    <a
+                        href="https://scratch.mit.edu/users/World_Languages/#comments"
+                        target="_blank"
+                        rel="noreferrer"
+                        className={styles.feedbackButtonOuter}
+                    >
+                        <span className={styles.feedbackButtonInner}>
+                            {settingsTranslations['tw.addons.settings.addonFeedback']}
+                        </span>
+                    </a>
                     {this.state.dirty && (
                         <DirtyComponent
                             onReloadNow={this.props.onReloadNow && this.handleReloadNow}

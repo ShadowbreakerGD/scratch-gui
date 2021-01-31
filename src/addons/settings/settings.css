@@ -33,6 +33,10 @@ a[href] {
 [theme="dark"] a[href] {
     color: #6d9bff;
 }
+a:active, a:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px #ff4c4c5d;
+}
 
 .container {
     position: absolute;
@@ -57,7 +61,7 @@ a[href] {
 [theme="dark"] .header {
     background-color: #222222;
 }
-@media (max-width: 550px) {
+@media (max-width: 700px) {
     .header {
         padding-left: 5px;
         padding-right: 5px;
@@ -70,11 +74,14 @@ a[href] {
     border: 1px solid #acacac;
     padding: 8px 12px;
     border-radius: 4px;
-    transition: 0.25s ease;
     outline: none;
     height: 32px;
     font-family: inherit;
     font-size: 14px;
+    transition: 0.25s ease;
+    transition-property: background;
+    display: flex;
+    align-items: center;
 }
 [theme="dark"] .button {
     color: #fff;
@@ -99,7 +106,7 @@ a[href] {
     border-radius: 4px;
 }
 .search-container:focus-within {
-    border-color: #222;
+    box-shadow: 0 0 0 3px #ff4c4c5d;
 }
 .search-input {
     color: inherit;
@@ -118,7 +125,7 @@ a[href] {
     outline: none;
     cursor: pointer;
     background-color: transparent;
-    background-image: url("./search.svg");
+    background-image: url("./search-black.svg");
     background-repeat: no-repeat;
     background-position: center;
 }
@@ -127,11 +134,35 @@ a[href] {
     background-color: #111111;
     border-color: #222222;
 }
-[theme="dark"] .search-container:focus-within {
-    border-color: #444;
-}
 [theme="dark"] .search-button {
-    filter: invert(100%);
+    background-image: url("./search-white.svg");
+}
+
+.feedback-button-outer {
+    background: white;
+    color: inherit !important;
+    box-sizing: border-box;
+    border: 1px solid #cecece;
+    height: 38px;
+    border-radius: 4px;
+    padding: 0 12px;
+    margin-left: 10px;
+    font-size: 12px;
+    outline: none;
+    display: flex;
+    align-items: center;
+    text-decoration: none !important;
+}
+[theme="dark"] .feedback-button-outer {
+    background-color: #111111;
+    border-color: #222222;
+}
+.feedback-button-outer:active, .feedback-button-outer:focus-within {
+    box-shadow: 0 0 0 3px #ff4c4c5d;
+}
+.feedback-button-inner {
+    text-decoration: none;
+    font-weight: bold;
 }
 
 .addons {
@@ -140,7 +171,7 @@ a[href] {
     padding: 10px 20px;
     height: 100%;
 }
-@media (max-width: 550px) {
+@media (max-width: 700px) {
     .addons {
         padding-left: 5px;
         padding-right: 5px;
@@ -177,9 +208,6 @@ a[href] {
     height: 16px;
     width: 16px;
     margin-right: 8px;
-}
-[theme="dark"] .extension-image {
-    filter: invert(100%);
 }
 
 .addon-title {
@@ -225,9 +253,6 @@ a[href] {
     height: 16px;
     width: 16px;
 }
-[theme="dark"] .reset-button-image {
-    filter: invert(100%);
-}
 [theme="dark"] .reset-button:hover {
     background: rgba(255, 255, 255, 0.05);
 }
@@ -241,7 +266,8 @@ a[href] {
     border-radius: 10px;
     position: relative;
     cursor: pointer;
-    transition: all 0.25s ease;
+    transition: 0.25s ease;
+    transition-property: background;
 }
 .switch[state="on"] {
     background: #ff4c4c;
@@ -256,7 +282,8 @@ a[href] {
     border-radius: 5px;
     top: 5px;
     left: 5px;
-    transition: all 0.25s ease;
+    transition: 0.25s ease;
+    transition-property: background, left;
 }
 [theme="dark"] .switch::before {
     background: #aaa;
@@ -284,6 +311,11 @@ a[href] {
     color: white;
     background-color: #175ef8;
     border-color: #0e44b8;
+}
+.tag-theme {
+    color: black;
+    background-color: #9ad4cf;
+    border-color: #628f8c;
 }
 .tag-beta {
     color: white;
@@ -344,6 +376,7 @@ a[href] {
 }
 .notice-icon {
     height: 16px;
+    width: 16px;
     margin-right: 10px;
 }
 
@@ -380,6 +413,7 @@ a[href] {
     padding: 8px 12px;
     border-radius: 4px;
     transition: 0.25s ease;
+    transition-property: background;
 }
 [theme="dark"] .setting input {
     color: #fff;
@@ -442,6 +476,7 @@ a[href] {
     border: 1px solid #aaa;
     border-right-width: 0;
     transition: 0.25s ease;
+    transition-property: color, background, border;
 }
 [theme="dark"] .select-option {
     color: #fff;
@@ -486,6 +521,7 @@ a[href] {
 
 .footer-buttons {
     margin-bottom: 10px;
+    display: flex;
 }
 .footer-buttons > .button {
     margin-right: 10px;
@@ -524,6 +560,8 @@ a[href] {
     border: 1px solid #cfcfcf;
     border-radius: 4px;
     pointer-events: auto;
+    display: flex;
+    align-items: center;
 }
 [theme="dark"] .dirty-inner {
     background: rgb(39, 50, 53);

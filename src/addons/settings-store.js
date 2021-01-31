@@ -18,11 +18,12 @@
 
 import addons from './addon-manifests';
 import upstreamMeta from './upstream-meta.json';
+import EventTargetShim from './event-target';
 
 const SETTINGS_KEY = 'tw:addons';
 const VERSION = 1;
 
-class SettingsStore extends EventTarget {
+class SettingsStore extends EventTargetShim {
     constructor () {
         super();
         this.store = this.readLocalStorage();
@@ -31,11 +32,19 @@ class SettingsStore extends EventTarget {
     /**
      * @private
      */
-    readLocalStorage () {
-        const base = {};
+    createEmptyStore () {
+        const result = {};
         for (const addonId of Object.keys(addons)) {
-            base[addonId] = {};
+            result[addonId] = {};
         }
+        return result;
+    }
+
+    /**
+     * @private
+     */
+    readLocalStorage () {
+        const base = this.createEmptyStore();
         try {
             const local = localStorage.getItem(SETTINGS_KEY);
             if (local) {
@@ -231,6 +240,9 @@ class SettingsStore extends EventTarget {
         for (const addon of Object.keys(addons)) {
             this.resetAddon(addon, true);
         }
+        // In case resetAddon missed some properties, do a hard reset on storage.
+        this.store = this.createEmptyStore();
+        this.saveToLocalStorage();
     }
 
     resetAddon (addonId, resetEverything) {
@@ -242,7 +254,11 @@ class SettingsStore extends EventTarget {
                 }
                 continue;
             }
-            this.setAddonSetting(addonId, setting, null);
+            try {
+                this.setAddonSetting(addonId, setting, null);
+            } catch (e) {
+                // ignore
+            }
         }
     }
 
@@ -291,7 +307,7 @@ class SettingsStore extends EventTarget {
 
     setStore (store) {
         this.store = store;
-        SettingsStore.dispatchEvent(new CustomEvent('store-changed'));
+        this.dispatchEvent(new CustomEvent('store-changed'));
     }
 }
 

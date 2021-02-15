@@ -36,6 +36,7 @@ import undoImageWhite from './undo-white.svg';
 import undoImageBlack from './undo-black.svg';
 import infoImage from './info.svg';
 import styles from './settings.css';
+import '../../lib/normalize.css';
 
 /* eslint-disable no-alert */
 /* eslint-disable no-console */
@@ -154,6 +155,11 @@ const TagComponent = ({tags}) => tags.length > 0 && (
         {tags.includes('easterEgg') && (
             <span className={classNames(styles.tag, styles.tagEasterEgg)}>
                 {settingsTranslations['tw.addons.settings.tags.easterEgg']}
+            </span>
+        )}
+        {tags.includes('new') && (
+            <span className={classNames(styles.tag, styles.tagNew)}>
+                {settingsTranslations['tw.addons.settings.tags.new']}
             </span>
         )}
         {tags.includes('turbowarp') && (

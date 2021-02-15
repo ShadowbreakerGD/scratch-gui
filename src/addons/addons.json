@@ -8,13 +8,15 @@
     "onion-skinning",
     "bitmap-copy",
     "remove-sprite-confirm",
+    "pause",
+    "mute-project",
     "clones",
     "mouse-pos",
     "hide-flyout",
+    "tw-project-info",
     "editor-theme3",
     "editor-stage-left",
     "editor-colored-context-menus",
     "fix-uploaded-svgs",
-    "tw-compiler-options",
     "cat-blocks"
 ]

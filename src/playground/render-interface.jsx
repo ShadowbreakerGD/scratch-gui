@@ -223,7 +223,7 @@ const Interface = ({
                                     rel="noreferrer"
                                 >
                                     <FormattedMessage
-                                        defaultMessage="Privacy"
+                                        defaultMessage="Privacy Policy"
                                         description="Link to privacy policy"
                                         id="tw.privacy"
                                     />

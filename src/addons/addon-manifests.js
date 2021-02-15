@@ -17,6 +17,8 @@
  */
 
 import addons from './addons.json';
+import newAddons from './new-addons.json';
+import isMobile from './is-mobile';
 
 const clipboardSupported = !!(navigator.clipboard && navigator.clipboard.write);
 const mediaRecorderSupported = !!window.MediaRecorder;
@@ -37,6 +39,17 @@ const addonMap = {};
 export const unsupportedAddons = {};
 for (const addonId of addons) {
     const manifest = require(`./addons/${addonId}/addon.json`);
+    if (isMobile) {
+        if (typeof manifest.enabledByDefaultMobile !== 'undefined') {
+            manifest.enabledByDefault = manifest.enabledByDefaultMobile;
+        }
+    }
+    if (newAddons.includes(addonId)) {
+        if (!manifest.tags) {
+            manifest.tags = [];
+        }
+        manifest.tags.push('new');
+    }
     if (isSupported(manifest)) {
         addonMap[addonId] = manifest;
     } else {

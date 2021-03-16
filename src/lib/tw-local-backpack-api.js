@@ -26,9 +26,10 @@ const arrayBufferToBase64 = buffer => {
     return btoa(binary);
 };
 
-const generateID = () => Math.random().toString();
-
 const idbItemToBackpackItem = item => {
+    // convert id to string
+    item.id = `${item.id}`;
+
     item.thumbnailUrl = `data:;base64,${arrayBufferToBase64(item.thumbnailData)}`;
     item.bodyUrl = `data:;base64,${arrayBufferToBase64(item.bodyData)}`;
 
@@ -80,7 +81,8 @@ const openDB = () => new Promise((resolve, reject) => {
     request.onupgradeneeded = e => {
         const db = e.target.result;
         db.createObjectStore(STORE_NAME, {
-            keyPath: 'id'
+            keyPath: 'id',
+            autoIncrement: true
         });
     };
 
@@ -107,9 +109,17 @@ const getBackpackContents = async ({
         const store = transaction.objectStore(STORE_NAME);
         const items = [];
         const request = store.openCursor(null, 'prev');
+        let first = true;
         request.onsuccess = e => {
             const cursor = e.target.result;
-            if (cursor) {
+            if (first) {
+                first = false;
+                if (offset !== 0) {
+                    cursor.advance(offset);
+                    return;
+                }
+            }
+            if (cursor && items.length < limit) {
                 items.push(idbItemToBackpackItem(cursor.value));
                 cursor.continue();
             } else {
@@ -136,7 +146,6 @@ const saveBackpackObject = async ({
         const bodyData = base64ToArrayBuffer(body);
         const bodyMD5 = md5(bodyData);
         const idbItem = {
-            id: generateID(),
             type,
             mime,
             name,
@@ -144,8 +153,11 @@ const saveBackpackObject = async ({
             bodyMD5,
             thumbnailData: base64ToArrayBuffer(thumbnail)
         };
-        store.put(idbItem);
-        resolve(idbItemToBackpackItem(idbItem));
+        const putRequest = store.put(idbItem);
+        putRequest.onsuccess = () => {
+            idbItem.id = putRequest.result;
+            resolve(idbItemToBackpackItem(idbItem));
+        };
     });
 };
 

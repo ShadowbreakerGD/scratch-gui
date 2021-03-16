@@ -171,8 +171,10 @@ const deleteBackpackObject = async ({
         };
         const store = transaction.objectStore(STORE_NAME);
         // Convert string IDs to number IDs
-        store.delete(+id);
-        resolve();
+        const deleteRequest = store.delete(+id);
+        deleteRequest.onsuccess = () => {
+            resolve();
+        };
     });
 };
 

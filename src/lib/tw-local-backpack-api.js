@@ -113,7 +113,7 @@ const getBackpackContents = async ({
             const cursor = e.target.result;
             if (first) {
                 first = false;
-                if (offset !== 0) {
+                if (cursor && offset !== 0) {
                     cursor.advance(offset);
                     return;
                 }

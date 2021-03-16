@@ -33,8 +33,10 @@ const idbItemToBackpackItem = item => {
     item.thumbnailUrl = `data:;base64,${arrayBufferToBase64(item.thumbnailData)}`;
 
     let assetType;
-    if (item.type === 'script' || item.type === 'sprite') {
+    if (item.type === 'script') {
         item.bodyUrl = `data:application/json;base64,${arrayBufferToBase64(item.bodyData)}`;
+    } else if (item.type === 'sprite') {
+        item.bodyUrl = `data:application/zip;base64,${arrayBufferToBase64(item.bodyData)}`;
     } else if (item.type === 'costume') {
         if (item.mime === 'image/svg+xml') {
             assetType = storage.AssetType.ImageVector;

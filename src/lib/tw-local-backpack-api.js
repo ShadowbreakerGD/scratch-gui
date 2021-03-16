@@ -31,11 +31,10 @@ const idbItemToBackpackItem = item => {
     item.id = `${item.id}`;
 
     item.thumbnailUrl = `data:;base64,${arrayBufferToBase64(item.thumbnailData)}`;
-    item.bodyUrl = `data:;base64,${arrayBufferToBase64(item.bodyData)}`;
 
     let assetType;
-    if (item.type === 'code') {
-        // Asset type not needed
+    if (item.type === 'script' || item.type === 'sprite') {
+        item.bodyUrl = `data:application/json;base64,${arrayBufferToBase64(item.bodyData)}`;
     } else if (item.type === 'costume') {
         if (item.mime === 'image/svg+xml') {
             assetType = storage.AssetType.ImageVector;
@@ -44,8 +43,6 @@ const idbItemToBackpackItem = item => {
         }
     } else if (item.type === 'sound') {
         assetType = storage.AssetType.Sound;
-    } else if (item.type === 'sprite') {
-        assetType = storage.AssetType.Sprite;
     }
 
     if (assetType) {
@@ -55,7 +52,7 @@ const idbItemToBackpackItem = item => {
         item.body = md5ext;
         storage.builtinHelper._store(
             assetType,
-            assetType.runtimeFormat,
+            extension,
             new Uint8Array(item.bodyData),
             itemMD5
         );

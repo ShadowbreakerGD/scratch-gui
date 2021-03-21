@@ -3,8 +3,9 @@ import React from 'react';
 import {connect} from 'react-redux';
 import bindAll from 'lodash.bindall';
 
-import {defaultProjectId, setProjectId, getIsLoading, getIsFetchingWithId} from '../../reducers/project-state';
+import {defaultProjectId, getIsLoading, getIsFetchingWithId} from '../../reducers/project-state';
 import styles from './project-input.css';
+import visitProject from '../../lib/tw-visit-project';
 
 const PROJECT_BASE = 'https://scratch.mit.edu/projects/';
 
@@ -90,7 +91,6 @@ class ProjectInput extends React.Component {
                 onPaste={this.handlePaste}
                 onBlur={this.handleBlur}
                 onFocus={this.handleFocus}
-                disabled={this.props.loading}
             />
         );
     }
@@ -108,7 +108,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-    setProjectId: projectId => dispatch(setProjectId(projectId))
+    setProjectId: projectId => visitProject(dispatch, projectId)
 });
 
 export default connect(
